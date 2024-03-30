@@ -1,0 +1,41 @@
+{
+  "name": "podkast-audio-player",
+  "version": "1.0.0",
+  "description": "A custom audio player component for React.",
+  "main": "dist/AudioPlayer.js",
+  "scripts": {
+    "start": "npm start",
+    "build": "npx babel src -d dist"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/PrasanthYT/podkast-audio-player.git"
+  },
+  "babel": {
+    "presets": [
+      "@babel/preset-env",
+      "@babel/preset-react"
+    ]
+  },
+  "keywords": [
+    "audio-player",
+    "podkast",
+    "music"
+  ],
+  "author": "Prasanth",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/PrasanthYT/podkast-audio-player/issues"
+  },
+  "homepage": "https://github.com/PrasanthYT/podkast-audio-player#readme",
+  "dependencies": {
+    "prop-types": "^15.8.1",
+    "react": "^18.2.0"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.24.1",
+    "@babel/core": "^7.24.3",
+    "@babel/preset-env": "^7.24.3",
+    "@babel/preset-react": "^7.24.1"
+  }
+}
