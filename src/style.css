@@ -1,0 +1,68 @@
+.custom-audio-player {
+    width: 300px;
+    margin: 20px auto;
+    background-color: #767676;
+    border-radius: 10px;
+    padding: 20px;
+  }
+  
+  .controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  
+  .controls img {
+    cursor: pointer;
+    width: 30px;
+    height: 30px;
+  }
+  
+  .progress-bar-container {
+    display: flex;
+    align-items: center;
+  }
+  
+  .progress-time,
+  .duration {
+    margin: 0 10px;
+  }
+  
+  .progress-bar {
+    background-color: #ccc;
+    height: 10px;
+    border-radius: 5px;
+    flex-grow: 1;
+    margin: 0 10px;
+    cursor: pointer;
+    position: relative;
+  }
+  
+  .progress-audio {
+    height: 100%;
+    background-color: #007bff;
+    border-radius: 5px;
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+  
+  .menu-popup {
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #f0f0f0;
+    border-radius: 5px;
+    padding: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .menu-popup p {
+    margin: 5px 0;
+  }
+  
