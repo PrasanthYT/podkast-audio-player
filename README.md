@@ -1,6 +1,6 @@
 # Podkast Audio Player
 
-PYBNJUHJBV odkast Audio Player is a lightweight and customizable audio player library designed specifically for podcasting applications. With seamless integration into React projects, it provides a range of features to enhance the podcast listening experience.
+PodKast Audio Player is a customizable React component for playing audio files with a user-friendly interface. It provides features like play/pause, volume control, skip forward/backward, loop, shuffle, and progress tracking.
 
 ## Features
 
@@ -21,28 +21,53 @@ npm install podkast-audio-player
 
 ## Usage
 
+To use the PodKast Audio Player component in your React application, simply import it and pass the necessary props:
+
 ```jsx
 import React from 'react';
 import AudioPlayer from 'podkast-audio-player';
 
-const audioSrc = ['audio1.mp3', 'audio2.mp3', 'audio3.mp3'];
+function MyComponent() {
+  // Define your array of audio data
+  const audioData = [
+    {
+      audioSrc: 'path/to/audio1.mp3',
+      title1: 'Title 1',
+      title2: 'Artist 1',
+      coverpic: 'path/to/cover1.jpg'
+    },
+    {
+      audioSrc: 'path/to/audio2.mp3',
+      title1: 'Title 2',
+      title2: 'Artist 2',
+      coverpic: 'path/to/cover2.jpg'
+    },
+    // Add more audio objects as needed
+  ];
 
-function App() {
   return (
     <div>
-      <AudioPlayer audioSrc={audioSrc} />
+      <AudioPlayer songs={audioData} theme="light" />
     </div>
   );
 }
 
-export default App;
+export default MyComponent;
 ```
 
 ## Props
-- **audioSrc:** An array of strings representing the URLs or paths to the audio files.
+
+- **songs (required):** An array of objects representing each audio track. Each object should have the following properties:
+  - **audioSrc (string):** The path to the audio file.
+  - **title1 (string):** The main title or name of the audio track.
+  - **title2 (string):** Additional information about the audio track (e.g., artist name).
+  - **coverpic (string):** The path to the cover image associated with the audio track.
+- **theme (optional):** Specifies the color theme of the player. Can be either "light" or "dark". Defaults to "light".
 
 ## Contributing
+
 Contributions are welcome! Please feel free to submit issues and pull requests.
 
 ## License
+
 Podkast Audio Player is licensed under the MIT License.
