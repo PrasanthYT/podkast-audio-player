@@ -1,6 +1,6 @@
 {
   "name": "podkast-audio-player",
-  "version": "1.0.0",
+  "version": "1.2.0",
   "description": "A custom audio player component for React.",
   "main": "dist/AudioPlayer.js",
   "scripts": {
