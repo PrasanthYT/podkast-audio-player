@@ -3,6 +3,7 @@ import PropTypes from "prop-types";
 import "./style.css";
 
 // Icons
+// Light Theme
 import backwardIcon from "./assets/Previous.svg";
 import forwardIcon from "./assets/Next.svg";
 import pauseIcon from "./assets/Pause.svg";
@@ -17,6 +18,21 @@ import volumeIcon20 from "./assets/Volume20.svg";
 import muteIcon from "./assets/Mute.svg";
 import forwardTen from "./assets/Forward-10.svg";
 
+// Dark Theme
+import backwardIconDark from "./assets/Previous-Dark.svg";
+import forwardIconDark from "./assets/Next-Dark.svg";
+import pauseIconDark from "./assets/Pause-Dark.svg";
+import playIconDark from "./assets/Play-Dark.svg";
+import loopEnabledIconDark from "./assets/Loop-Disabled-Dark.svg";
+import loopDisabledIconDark from "./assets/Loop-Dark.svg";
+import shuffleDisabledIconDark from "./assets/Shuffle-Dark.svg";
+import shuffleEnabledIconDark from "./assets/Shuffle-Enabled-Dark.svg";
+import volumeIcon100Dark from "./assets/Volume100-Dark.svg";
+import volumeIcon50Dark from "./assets/Volume50-Dark.svg";
+import volumeIcon20Dark from "./assets/Volume20-Dark.svg";
+import muteIconDark from "./assets/Mute-Dark.svg";
+import forwardTenDark from "./assets/Forward-10-Dark.svg";
+
 function formatTime(seconds) {
   const hours = Math.floor(seconds / 3600);
   const minutes = Math.floor((seconds % 3600) / 60);
@@ -26,7 +42,7 @@ function formatTime(seconds) {
     .padStart(2, "0")}:${remainingSeconds.toString().padStart(2, "0")}`;
 }
 
-function AudioPlayer({ audioSrc }) {
+function AudioPlayer({ songs, theme }) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
@@ -37,58 +53,95 @@ function AudioPlayer({ audioSrc }) {
   const audioRef = useRef(null);
   const progressBarRef = useRef(null);
 
-  // Callback to handle time update
+  const icons = {
+    light: {
+      backward: backwardIcon,
+      forward: forwardIcon,
+      pause: pauseIcon,
+      play: playIcon,
+      loopEnabled: loopEnabledIcon,
+      loopDisabled: loopDisabledIcon,
+      shuffleEnabled: shuffleEnabledIcon,
+      shuffleDisabled: shuffleDisabledIcon,
+      volume100: volumeIcon100,
+      volume50: volumeIcon50,
+      volume20: volumeIcon20,
+      mute: muteIcon,
+      forwardTen: forwardTen,
+    },
+    dark: {
+      backward: backwardIconDark,
+      forward: forwardIconDark,
+      pause: pauseIconDark,
+      play: playIconDark,
+      loopEnabled: loopEnabledIconDark,
+      loopDisabled: loopDisabledIconDark,
+      shuffleEnabled: shuffleEnabledIconDark,
+      shuffleDisabled: shuffleDisabledIconDark,
+      volume100: volumeIcon100Dark,
+      volume50: volumeIcon50Dark,
+      volume20: volumeIcon20Dark,
+      mute: muteIconDark,
+      forwardTen: forwardTenDark,
+    },
+  };
+
+  const currentSong = songs[currentTrackIndex];
+
+  // Callbacks
   const handleTimeUpdate = useCallback(() => {
+    console.log("Time updated");
     setCurrentTime(audioRef.current.currentTime);
   }, []);
 
-  // Callback to handle loaded metadata
   const handleLoadedMetadata = useCallback(() => {
     setDuration(audioRef.current.duration);
+    setIsPlaying(true); // Start playing the audio
   }, []);
 
-  // Callback to handle track end
   const handleTrackEnded = useCallback(() => {
+    console.log("Track ended");
     if (shuffle) {
       let newIndex = currentTrackIndex;
       while (newIndex === currentTrackIndex) {
-        newIndex = Math.floor(Math.random() * audioSrc.length);
+        newIndex = Math.floor(Math.random() * songs.length);
       }
       setCurrentTrackIndex(newIndex);
     } else {
       let newIndex = currentTrackIndex + 1;
-      if (newIndex >= audioSrc.length) {
+      if (newIndex >= songs.length) {
         newIndex = 0;
       }
       setCurrentTrackIndex(newIndex);
       setIsPlaying(false);
     }
-  }, [shuffle, currentTrackIndex, audioSrc]);
+  }, [shuffle, currentTrackIndex, songs]);
 
+  // Effects
   useEffect(() => {
-    // Set up event listeners
     const audio = audioRef.current;
-    audio.addEventListener("timeupdate", handleTimeUpdate);
-    audio.addEventListener("loadedmetadata", handleLoadedMetadata);
-    audio.addEventListener("ended", handleTrackEnded);
+    if (audio) {
+      audio.addEventListener("timeupdate", handleTimeUpdate);
+      audio.addEventListener("loadedmetadata", handleLoadedMetadata);
+      audio.addEventListener("ended", handleTrackEnded);
+    }
 
     return () => {
-      // Clean up event listeners
-      audio.removeEventListener("timeupdate", handleTimeUpdate);
-      audio.removeEventListener("loadedmetadata", handleLoadedMetadata);
-      audio.removeEventListener("ended", handleTrackEnded);
+      if (audio) {
+        audio.removeEventListener("timeupdate", handleTimeUpdate);
+        audio.removeEventListener("loadedmetadata", handleLoadedMetadata);
+        audio.removeEventListener("ended", handleTrackEnded);
+      }
     };
   }, [handleTimeUpdate, handleLoadedMetadata, handleTrackEnded]);
 
   useEffect(() => {
-    // Load audio when current track index or audio source changes
-    if (audioSrc && audioSrc.length > 0) {
+    if (songs && songs.length > 0) {
       audioRef.current.load();
     }
-  }, [currentTrackIndex, audioSrc]);
+  }, [currentTrackIndex, songs]);
 
   useEffect(() => {
-    // Play or pause audio based on isPlaying state
     if (isPlaying) {
       audioRef.current.play();
     } else {
@@ -96,26 +149,23 @@ function AudioPlayer({ audioSrc }) {
     }
   }, [isPlaying]);
 
-  // Auto play when track changes
   useEffect(() => {
     if (isPlaying) {
       audioRef.current.play();
     }
   }, [currentTrackIndex, isPlaying]);
 
-  const togglePlayPause = () => {
-    // Toggle play/pause state
+  // Handlers
+  const togglePlayPause = useCallback(() => {
     setIsPlaying((prevIsPlaying) => !prevIsPlaying);
-  };
+  }, []);
 
-  const handleVolumeChange = (value) => {
-    // Set volume
+  const handleVolumeChange = useCallback((value) => {
     setVolume(value);
     audioRef.current.volume = value;
-  };
+  }, []);
 
-  const handleVolumeClick = () => {
-    // Cycle through volume levels
+  const handleVolumeClick = useCallback(() => {
     if (volume === 1) {
       handleVolumeChange(0.5);
     } else if (volume === 0.5) {
@@ -125,116 +175,161 @@ function AudioPlayer({ audioSrc }) {
     } else {
       handleVolumeChange(1);
     }
-  };
+  }, [handleVolumeChange, volume]);
 
-  const handleNextSong = () => {
-    // Play the next song
+  const handleNextSong = useCallback(() => {
     let newIndex = currentTrackIndex + 1;
-    if (newIndex >= audioSrc.length) {
+    if (newIndex >= songs.length) {
       newIndex = 0;
     }
     setCurrentTrackIndex(newIndex);
-    setIsPlaying(true); // Start playing automatically
-  };
+    setIsPlaying(true);
+  }, [currentTrackIndex, songs]);
 
-  const handlePreviousSong = () => {
-    // Play the previous song
+  const handlePreviousSong = useCallback(() => {
     let newIndex = currentTrackIndex - 1;
     if (newIndex < 0) {
-      newIndex = audioSrc.length - 1;
+      newIndex = songs.length - 1;
     }
     setCurrentTrackIndex(newIndex);
-    setIsPlaying(true); // Start playing automatically
-  };
+    setIsPlaying(true);
+  }, [currentTrackIndex, songs]);
 
-  const handleLoopToggle = () => {
-    // Toggle loop mode
+  const handleLoopToggle = useCallback(() => {
     setLoop((prevLoop) => !prevLoop);
-  };
+  }, []);
 
-  const handleShuffleToggle = () => {
-    // Toggle shuffle mode
+  const handleShuffleToggle = useCallback(() => {
     if (!shuffle) {
-      const newIndex = Math.floor(Math.random() * audioSrc.length);
+      const newIndex = Math.floor(Math.random() * songs.length);
       setCurrentTrackIndex(newIndex);
     }
     setShuffle((prevShuffle) => !prevShuffle);
-  };
+  }, [shuffle, songs]);
 
-  const handleSkipForward = () => {
-    // Skip forward 10 seconds
+  const handleSkipForward = useCallback(() => {
     audioRef.current.currentTime += 10;
-  };
+  }, []);
 
-  const handleProgressBarClick = (e) => {
-    // Seek to clicked position on progress bar
-    const rect = progressBarRef.current.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const percentage = (x / rect.width) * 100;
-    const newTime = (percentage / 100) * duration;
-    audioRef.current.currentTime = newTime;
-    setCurrentTime(newTime);
-  };
+  const handleProgressBarClick = useCallback(
+    (e) => {
+      const rect = progressBarRef.current.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const percentage = (x / rect.width) * 100;
+      const newTime = (percentage / 100) * duration;
+      audioRef.current.currentTime = newTime;
+      setCurrentTime(newTime);
+    },
+    [duration]
+  );
 
   return (
-    <div className="custom-audio-player">
-      <audio
-        ref={audioRef}
-        src={audioSrc && audioSrc.length > 0 ? audioSrc[currentTrackIndex] : ""}
-      ></audio>
-      <div className="controls">
-        <img
-          src={
-            volume === 1
-              ? volumeIcon100
-              : volume === 0.5
-              ? volumeIcon50
-              : volume === 0.2
-              ? volumeIcon20
-              : muteIcon
-          }
-          alt="Volume"
-          onClick={handleVolumeClick}
-        />
-        <img
-          src={loop ? loopDisabledIcon : loopEnabledIcon}
-          alt="Loop"
-          onClick={handleLoopToggle}
-        />
-        <img src={backwardIcon} alt="Backward" onClick={handlePreviousSong} />
-        <img
-          src={isPlaying ? pauseIcon : playIcon}
-          alt="Play/Pause"
-          onClick={togglePlayPause}
-        />
-        <img src={forwardIcon} alt="Forward" onClick={handleNextSong} />
-        <img
-          src={shuffle ? shuffleEnabledIcon : shuffleDisabledIcon}
-          alt="Shuffle"
-          onClick={handleShuffleToggle}
-        />
-        <img src={forwardTen} alt="Sleep Timer" onClick={handleSkipForward} />
-      </div>
-      <div className="progress-bar-container">
-        <div className="progress-time">{formatTime(currentTime)}</div>
+    <div className="card">
+      <div className="top">
         <div
-          className="progress-bar"
-          onClick={handleProgressBarClick}
-          ref={progressBarRef}
+          className="pfp"
+          style={{ backgroundImage: `url(${currentSong.coverpic})` }}
         >
-          <div
-            className="progress-audio"
-            style={{ width: `${(currentTime / duration) * 100}%` }}
-          ></div>
+          <div className="playing">
+            <div className="greenline line-1"></div>
+            <div className="greenline line-2"></div>
+            <div className="greenline line-3"></div>
+            <div className="greenline line-4"></div>
+            <div className="greenline line-5"></div>
+          </div>
         </div>
-        <div className="duration">{formatTime(duration)}</div>
+        <div className="texts">
+          <p className="title-1">{currentSong.title1}</p>
+          <p className="title-2">{currentSong.title2}</p>
+        </div>
+        <audio ref={audioRef} src={currentSong.audioSrc}></audio>
       </div>
+
+      <div className="controls">
+        <div className="controllers">
+          <div className="podkast-audio-player-left-controllers">
+            <img
+              src={
+                volume === 1
+                  ? icons[theme].volume100
+                  : volume === 0.5
+                  ? icons[theme].volume50
+                  : volume === 0.2
+                  ? icons[theme].volume20
+                  : icons[theme].mute
+              }
+              alt="Volume"
+              onClick={handleVolumeClick}
+            />
+            <img
+              src={icons[theme].forwardTen}
+              alt="Forward Ten"
+              onClick={handleSkipForward}
+            />
+          </div>
+          <div className="podkast-audio-player-main-controllers">
+            <img
+              src={icons[theme].backward}
+              alt="Backward"
+              onClick={handlePreviousSong}
+            />
+            <img
+              src={isPlaying ? icons[theme].pause : icons[theme].play}
+              alt="Play/Pause"
+              onClick={togglePlayPause}
+              className="play-button"
+            />
+            <img
+              src={icons[theme].forward}
+              alt="Forward"
+              onClick={handleNextSong}
+            />
+          </div>
+          <div className="podkast-audio-player-right-controllers">
+            <img
+              src={loop ? icons[theme].loopDisabled : icons[theme].loopEnabled}
+              alt="Loop"
+              onClick={handleLoopToggle}
+            />
+            <img
+              src={
+                shuffle
+                  ? icons[theme].shuffleEnabled
+                  : icons[theme].shuffleDisabled
+              }
+              alt="Shuffle"
+              onClick={handleShuffleToggle}
+            />
+          </div>
+        </div>
+      </div>
+
+      <div
+        className="time"
+        ref={progressBarRef}
+        onClick={handleProgressBarClick}
+      >
+        <div
+          className="elapsed"
+          style={{ width: `${(currentTime / duration) * 100}%` }}
+        ></div>
+      </div>
+      <p className="timetext time_now">{formatTime(currentTime)}</p>
+      <p className="timetext time_full">{formatTime(duration)}</p>
     </div>
   );
 }
 
 AudioPlayer.propTypes = {
-  audioSrc: PropTypes.arrayOf(PropTypes.string).isRequired,
+  songs: PropTypes.arrayOf(
+    PropTypes.shape({
+      audioSrc: PropTypes.string.isRequired,
+      title1: PropTypes.string.isRequired,
+      title2: PropTypes.string.isRequired,
+      coverpic: PropTypes.string.isRequired,
+    })
+  ).isRequired,
+  theme: PropTypes.oneOf(["light", "dark"]).isRequired,
 };
 
 export default AudioPlayer;
