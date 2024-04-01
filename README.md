@@ -19,6 +19,12 @@ You can install the Podkast Audio Player library via npm:
 npm install podkast-audio-player
 ```
 
+Or you can install via yarn
+
+``` bash
+yarn add podkast-audio-player
+```
+
 ## Usage
 
 To use the PodKast Audio Player component in your React application, simply import it and pass the necessary props:
