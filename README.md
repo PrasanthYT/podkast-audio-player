@@ -4,12 +4,12 @@ PodKast Audio Player is a customizable React component for playing audio files w
 
 ## Features
 
-- **Customizable Controls:** Intuitive controls for play/pause, volume adjustment, looping, shuffling, and skipping forward.
-- **Responsive Design:** Adapts gracefully to various screen sizes, ensuring a consistent user experience across devices.
-- **Track Progress Bar:** Visual progress bar displays the current playback position within the audio track for seamless navigation.
-- **Auto-Play Functionality:** Automatically starts playing the next track in the playlist when the current track ends.
-- **Shuffle Mode:** Enables shuffling the playback order of podcast episodes for added variety.
-- **Volume Control:** Allows users to adjust volume level with support for muting and incremental volume changes.
+- Play/pause audio
+- Adjust volume
+- Skip forward/backward
+- Loop and shuffle modes
+- Progress tracking
+- Customizable color theme
 
 ## Installation
 
