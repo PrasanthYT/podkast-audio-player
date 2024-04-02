@@ -90,7 +90,6 @@ function AudioPlayer({ songs, theme }) {
 
   // Callbacks
   const handleTimeUpdate = useCallback(() => {
-    console.log("Time updated");
     setCurrentTime(audioRef.current.currentTime);
   }, []);
 
