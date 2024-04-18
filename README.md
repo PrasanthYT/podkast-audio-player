@@ -38,15 +38,15 @@ function MyComponent() {
   const audioData = [
     {
       audioSrc: 'path/to/audio1.mp3',
-      title1: 'Title 1',
-      title2: 'Artist 1',
-      coverpic: 'path/to/cover1.jpg'
+      title: 'Title 1',
+      artists: 'Artist 1',
+      cover: 'path/to/cover1.jpg'
     },
     {
       audioSrc: 'path/to/audio2.mp3',
-      title1: 'Title 2',
-      title2: 'Artist 2',
-      coverpic: 'path/to/cover2.jpg'
+      title: 'Title 2',
+      artists: 'Artist 2',
+      cover: 'path/to/cover2.jpg'
     },
     // Add more audio objects as needed
   ];
@@ -65,10 +65,14 @@ export default MyComponent;
 
 - **songs (required):** An array of objects representing each audio track. Each object should have the following properties:
   - **audioSrc (string):** The path to the audio file.
-  - **title1 (string):** The main title or name of the audio track.
-  - **title2 (string):** Additional information about the audio track (e.g., artist name).
-  - **coverpic (string):** The path to the cover image associated with the audio track.
+  - **title (string):** The main title or name of the audio track.
+  - **artists (string):** Additional information about the audio track (e.g., artist name).
+  - **cover (string):** The path to the cover image associated with the audio track.
 - **theme (optional):** Specifies the color theme of the player. Can be either "light" or "dark". Defaults to "light".
+
+## Documentation
+
+For a full documentation, visit [podkast-audio-player](https://prasanth-1.gitbook.io/podkast-audio-player)
 
 ## Contributing
 

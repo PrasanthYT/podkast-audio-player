@@ -120,30 +120,35 @@ function AudioPlayer(_ref) {
 
   // Callbacks
   var handleTimeUpdate = (0, _react.useCallback)(function () {
-    console.log("Time updated");
     setCurrentTime(audioRef.current.currentTime);
   }, []);
   var handleLoadedMetadata = (0, _react.useCallback)(function () {
     setDuration(audioRef.current.duration);
-    setIsPlaying(true); // Start playing the audio
+    setIsPlaying(false); // Start playing the audio
   }, []);
   var handleTrackEnded = (0, _react.useCallback)(function () {
-    console.log("Track ended");
-    if (shuffle) {
-      var newIndex = currentTrackIndex;
-      while (newIndex === currentTrackIndex) {
-        newIndex = Math.floor(Math.random() * songs.length);
+    if (loop) {
+      // If loop is enabled, reset currentTime to 0 and keep playing the same track
+      audioRef.current.currentTime = 0;
+      audioRef.current.play();
+    } else {
+      var newIndex;
+      if (shuffle) {
+        // If shuffle mode is enabled, set a random track index
+        do {
+          newIndex = Math.floor(Math.random() * songs.length);
+        } while (newIndex === currentTrackIndex); // Ensure the new index is different from the current one
+      } else {
+        // If shuffle mode is not enabled, proceed to the next track
+        newIndex = currentTrackIndex + 1;
+        if (newIndex >= songs.length) {
+          newIndex = 0;
+        }
       }
       setCurrentTrackIndex(newIndex);
-    } else {
-      var _newIndex = currentTrackIndex + 1;
-      if (_newIndex >= songs.length) {
-        _newIndex = 0;
-      }
-      setCurrentTrackIndex(_newIndex);
-      setIsPlaying(false);
+      setIsPlaying(true);
     }
-  }, [shuffle, currentTrackIndex, songs]);
+  }, [loop, shuffle, currentTrackIndex, songs]);
 
   // Effects
   (0, _react.useEffect)(function () {
@@ -216,11 +221,6 @@ function AudioPlayer(_ref) {
     setCurrentTrackIndex(newIndex);
     setIsPlaying(true);
   }, [currentTrackIndex, songs]);
-  var handleLoopToggle = (0, _react.useCallback)(function () {
-    setLoop(function (prevLoop) {
-      return !prevLoop;
-    });
-  }, []);
   var handleShuffleToggle = (0, _react.useCallback)(function () {
     if (!shuffle) {
       var newIndex = Math.floor(Math.random() * songs.length);
@@ -230,6 +230,20 @@ function AudioPlayer(_ref) {
       return !prevShuffle;
     });
   }, [shuffle, songs]);
+  var handleLoopToggle = (0, _react.useCallback)(function () {
+    setLoop(function (prevLoop) {
+      return !prevLoop;
+    });
+  }, []);
+  (0, _react.useEffect)(function () {
+    var audio = audioRef.current;
+    if (audio) {
+      audio.addEventListener("ended", handleTrackEnded);
+      return function () {
+        audio.removeEventListener("ended", handleTrackEnded);
+      };
+    }
+  }, [handleTrackEnded]);
   var handleSkipForward = (0, _react.useCallback)(function () {
     audioRef.current.currentTime += 10;
   }, []);
@@ -241,8 +255,15 @@ function AudioPlayer(_ref) {
     audioRef.current.currentTime = newTime;
     setCurrentTime(newTime);
   }, [duration]);
+  function truncateTitle(title) {
+    var maxLength = 18;
+    if (title.length > maxLength) {
+      return title.substring(0, maxLength) + "...";
+    }
+    return title;
+  }
   return /*#__PURE__*/_react["default"].createElement("div", {
-    className: "card"
+    className: "card ".concat(theme === 'dark' ? 'dark' : '')
   }, /*#__PURE__*/_react["default"].createElement("div", {
     className: "top"
   }, /*#__PURE__*/_react["default"].createElement("div", {
@@ -253,22 +274,22 @@ function AudioPlayer(_ref) {
   }, /*#__PURE__*/_react["default"].createElement("div", {
     className: "playing"
   }, /*#__PURE__*/_react["default"].createElement("div", {
-    className: "greenline line-1"
+    className: "greenline line-1 ".concat(isPlaying ? "active" : "not")
   }), /*#__PURE__*/_react["default"].createElement("div", {
-    className: "greenline line-2"
+    className: "greenline line-2 ".concat(isPlaying ? "active" : "not")
   }), /*#__PURE__*/_react["default"].createElement("div", {
-    className: "greenline line-3"
+    className: "greenline line-3 ".concat(isPlaying ? "active" : "not")
   }), /*#__PURE__*/_react["default"].createElement("div", {
-    className: "greenline line-4"
+    className: "greenline line-4 ".concat(isPlaying ? "active" : "not")
   }), /*#__PURE__*/_react["default"].createElement("div", {
-    className: "greenline line-5"
+    className: "greenline line-5 ".concat(isPlaying ? "active" : "not")
   }))), /*#__PURE__*/_react["default"].createElement("div", {
     className: "texts"
   }, /*#__PURE__*/_react["default"].createElement("p", {
-    className: "title-1"
-  }, currentSong.title1), /*#__PURE__*/_react["default"].createElement("p", {
-    className: "title-2"
-  }, currentSong.title2)), /*#__PURE__*/_react["default"].createElement("audio", {
+    className: "title-1 ".concat(theme === "dark" ? "dark" : "")
+  }, truncateTitle(currentSong.title1)), /*#__PURE__*/_react["default"].createElement("p", {
+    className: "title-2 ".concat(theme === "dark" ? "dark" : "")
+  }, truncateTitle(currentSong.title2))), /*#__PURE__*/_react["default"].createElement("audio", {
     ref: audioRef,
     src: currentSong.audioSrc
   })), /*#__PURE__*/_react["default"].createElement("div", {
@@ -320,17 +341,17 @@ function AudioPlayer(_ref) {
       width: "".concat(currentTime / duration * 100, "%")
     }
   })), /*#__PURE__*/_react["default"].createElement("p", {
-    className: "timetext time_now"
+    className: "timetext ".concat(theme === "dark" ? "dark" : "", " time_now")
   }, formatTime(currentTime)), /*#__PURE__*/_react["default"].createElement("p", {
-    className: "timetext time_full"
+    className: "timetext ".concat(theme === "dark" ? "dark" : "", " time_full")
   }, formatTime(duration)));
 }
 AudioPlayer.propTypes = {
   songs: _propTypes["default"].arrayOf(_propTypes["default"].shape({
     audioSrc: _propTypes["default"].string.isRequired,
-    title1: _propTypes["default"].string.isRequired,
-    title2: _propTypes["default"].string.isRequired,
-    coverpic: _propTypes["default"].string.isRequired
+    title: _propTypes["default"].string.isRequired,
+    artists: _propTypes["default"].string.isRequired,
+    cover: _propTypes["default"].string.isRequired
   })).isRequired,
   theme: _propTypes["default"].oneOf(["light", "dark"]).isRequired
 };
