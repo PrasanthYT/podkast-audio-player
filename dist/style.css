@@ -1,16 +1,17 @@
-/* Spotify music card made by: csozi | Website: www.csozi.hu*/
-
 .card {
   position: relative;
-  width: 450px;
-  height: 130px;
+  width: 460px;
+  height: 150px;
   background: #191414;
   border-radius: 10px;
   padding: 10px;
 }
 
+.card.dark{
+  background-color: white;
+}
+
 .top {
-  position: relative;
   width: 100%;
   display: flex;
   gap: 10px;
@@ -40,7 +41,7 @@
   background-position: center;
   background-image: url('');
   filter: blur(5px);
-  z-index: -1; /* Ensure the blur layer is behind the image */
+  z-index: -1;
 }
 
 .texts{
@@ -54,10 +55,18 @@
   font-weight: bolder;
 }
 
+.title-1.dark{
+  color: #191414;
+}
+
 .title-2 {
   color: white;
   font-size: 10px;
   font-weight: bold;
+}
+
+.title-2.dark{
+  color: #191414;
 }
 
 .time {
@@ -72,7 +81,7 @@
 
 .elapsed {
   width: 42%;
-  background-color: #1db954;
+  background-color: orange;
   height: 100%;
   border-radius: 3px;
 }
@@ -110,13 +119,17 @@
 }
 
 .controls img:hover {
-  color: #1db954;
+  color: orange;
 }
 
 .timetext {
   color: white;
   font-size: 8px;
   position: absolute;
+}
+
+.timetext.dark {
+  color: #191414;
 }
 
 .time_now {
@@ -139,7 +152,7 @@
 }
 
 .greenline {
-  background-color: #1db954;
+  background-color: orange;
   height: 20px;
   width: 2px;
   position: relative;
@@ -189,6 +202,14 @@
   animation-delay: 0.4s;
 }
 
+.active {
+  animation-play-state: running;
+}
+
+.not{
+  animation-play-state: paused;
+}
+
 @keyframes playing {
   0% {
     transform: scaleY(0.1);
@@ -204,5 +225,17 @@
 
   100% {
     transform: scaleY(0.1);
+  }
+}
+
+@media (max-width: 1024px) {
+  .card{
+    width: 420px;
+  }
+}
+
+@media (max-width: 768px) {
+  .card{
+    width: 450px;
   }
 }

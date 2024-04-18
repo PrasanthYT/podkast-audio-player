@@ -1,6 +1,6 @@
 {
   "name": "podkast-audio-player",
-  "version": "1.5.1",
+  "version": "1.5.2",
   "description": "PodKast Audio Player is a customizable React component for playing audio files with a user-friendly interface. It provides features like play/pause, volume control, skip forward/backward, loop, shuffle, and progress tracking.",
   "main": "dist/AudioPlayer.js",
   "scripts": {
