@@ -95,26 +95,32 @@ function AudioPlayer({ songs, theme }) {
 
   const handleLoadedMetadata = useCallback(() => {
     setDuration(audioRef.current.duration);
-    setIsPlaying(true); // Start playing the audio
+    setIsPlaying(false); // Start playing the audio
   }, []);
 
   const handleTrackEnded = useCallback(() => {
-    console.log("Track ended");
-    if (shuffle) {
-      let newIndex = currentTrackIndex;
-      while (newIndex === currentTrackIndex) {
-        newIndex = Math.floor(Math.random() * songs.length);
-      }
-      setCurrentTrackIndex(newIndex);
+    if (loop) {
+      // If loop is enabled, reset currentTime to 0 and keep playing the same track
+      audioRef.current.currentTime = 0;
+      audioRef.current.play();
     } else {
-      let newIndex = currentTrackIndex + 1;
-      if (newIndex >= songs.length) {
-        newIndex = 0;
+      let newIndex;
+      if (shuffle) {
+        // If shuffle mode is enabled, set a random track index
+        do {
+          newIndex = Math.floor(Math.random() * songs.length);
+        } while (newIndex === currentTrackIndex); // Ensure the new index is different from the current one
+      } else {
+        // If shuffle mode is not enabled, proceed to the next track
+        newIndex = currentTrackIndex + 1;
+        if (newIndex >= songs.length) {
+          newIndex = 0;
+        }
       }
       setCurrentTrackIndex(newIndex);
-      setIsPlaying(false);
+      setIsPlaying(true);
     }
-  }, [shuffle, currentTrackIndex, songs]);
+  }, [loop, shuffle, currentTrackIndex, songs]);
 
   // Effects
   useEffect(() => {
@@ -194,10 +200,6 @@ function AudioPlayer({ songs, theme }) {
     setIsPlaying(true);
   }, [currentTrackIndex, songs]);
 
-  const handleLoopToggle = useCallback(() => {
-    setLoop((prevLoop) => !prevLoop);
-  }, []);
-
   const handleShuffleToggle = useCallback(() => {
     if (!shuffle) {
       const newIndex = Math.floor(Math.random() * songs.length);
@@ -205,6 +207,20 @@ function AudioPlayer({ songs, theme }) {
     }
     setShuffle((prevShuffle) => !prevShuffle);
   }, [shuffle, songs]);
+
+  const handleLoopToggle = useCallback(() => {
+    setLoop((prevLoop) => !prevLoop);
+  }, []);
+
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (audio) {
+      audio.addEventListener("ended", handleTrackEnded);
+      return () => {
+        audio.removeEventListener("ended", handleTrackEnded);
+      };
+    }
+  }, [handleTrackEnded]);
 
   const handleSkipForward = useCallback(() => {
     audioRef.current.currentTime += 10;
@@ -222,24 +238,42 @@ function AudioPlayer({ songs, theme }) {
     [duration]
   );
 
+  function truncateTitle(title) {
+    const maxLength = 18;
+    if (title.length > maxLength) {
+      return title.substring(0, maxLength) + "...";
+    }
+    return title;
+  }
+
   return (
-    <div className="card">
+    <div className={`card ${theme === 'dark' ? 'dark' : ''}`}>
       <div className="top">
         <div
           className="pfp"
           style={{ backgroundImage: `url(${currentSong.coverpic})` }}
         >
           <div className="playing">
-            <div className="greenline line-1"></div>
-            <div className="greenline line-2"></div>
-            <div className="greenline line-3"></div>
-            <div className="greenline line-4"></div>
-            <div className="greenline line-5"></div>
+            <div
+              className={`greenline line-1 ${isPlaying ? "active" : "not"}`}
+            ></div>
+            <div
+              className={`greenline line-2 ${isPlaying ? "active" : "not"}`}
+            ></div>
+            <div
+              className={`greenline line-3 ${isPlaying ? "active" : "not"}`}
+            ></div>
+            <div
+              className={`greenline line-4 ${isPlaying ? "active" : "not"}`}
+            ></div>
+            <div
+              className={`greenline line-5 ${isPlaying ? "active" : "not"}`}
+            ></div>
           </div>
         </div>
         <div className="texts">
-          <p className="title-1">{currentSong.title1}</p>
-          <p className="title-2">{currentSong.title2}</p>
+          <p className={`title-1 ${theme === "dark" ? "dark" : ""}`}>{truncateTitle(currentSong.title1)}</p>
+          <p className={`title-2 ${theme === "dark" ? "dark" : ""}`}>{truncateTitle(currentSong.title2)}</p>
         </div>
         <audio ref={audioRef} src={currentSong.audioSrc}></audio>
       </div>
@@ -302,7 +336,6 @@ function AudioPlayer({ songs, theme }) {
           </div>
         </div>
       </div>
-
       <div
         className="time"
         ref={progressBarRef}
@@ -313,8 +346,8 @@ function AudioPlayer({ songs, theme }) {
           style={{ width: `${(currentTime / duration) * 100}%` }}
         ></div>
       </div>
-      <p className="timetext time_now">{formatTime(currentTime)}</p>
-      <p className="timetext time_full">{formatTime(duration)}</p>
+      <p className={`timetext ${theme === "dark" ? "dark" : ""} time_now`}>{formatTime(currentTime)}</p>
+      <p className={`timetext ${theme === "dark" ? "dark" : ""} time_full`}>{formatTime(duration)}</p>
     </div>
   );
 }
@@ -323,9 +356,9 @@ AudioPlayer.propTypes = {
   songs: PropTypes.arrayOf(
     PropTypes.shape({
       audioSrc: PropTypes.string.isRequired,
-      title1: PropTypes.string.isRequired,
-      title2: PropTypes.string.isRequired,
-      coverpic: PropTypes.string.isRequired,
+      title: PropTypes.string.isRequired,
+      artists: PropTypes.string.isRequired,
+      cover: PropTypes.string.isRequired,
     })
   ).isRequired,
   theme: PropTypes.oneOf(["light", "dark"]).isRequired,
